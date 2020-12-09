@@ -8,14 +8,14 @@
 #pragma pack(push, 1)
 struct IPv4Header
 {
-    uint8_t  ip_verhl;
-    uint8_t  ip_tos;
-    uint16_t ip_dgmlen;
-    uint16_t ip_id;
-    uint16_t ip_off;
-    uint8_t  ip_ttl;
-    uint8_t  ip_proto;
-    uint16_t ip_csum;
+    uint8_t  verhl;
+    uint8_t  tos;
+    uint16_t total_len;
+    uint16_t id;
+    uint16_t off;
+    uint8_t  ttl;
+    uint8_t  proto;
+    uint16_t csum;
     uint32_t src_ip;
     uint32_t dst_ip;
 };
