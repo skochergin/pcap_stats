@@ -31,8 +31,8 @@ private:
     {
         std::uint32_t packet_len = pkth->caplen;
         statistics.total_packets++;
-        statistics.total_packets_length += pkth->caplen; // TODO: ask - len or caplen?
-        statistics.distribution_by_packet_length[packet_len]++;
+        statistics.total_packets_length += pkth->caplen;
+        statistics.distribution_by_packet_length.add_packet(packet_len);
         
         std::string dst_mac { data, data + 6 };
         std::string src_mac { data + 6, data + 12 };
@@ -41,34 +41,31 @@ private:
 
         uint16_t ether_type = htons(*reinterpret_cast<const uint16_t*>(data+12));
 
-        PacketProtocol l3_protocol = (ether_type == 0x0800) ? PacketProtocol::IPv4 : PacketProtocol::NON_IPv4;
+        std::string l3_protocol = (ether_type == 0x0800) ? "IPv4" : "NON_IPv4";
         statistics.distribution_by_packet_protocol[l3_protocol]++;
-        if(l3_protocol == PacketProtocol::IPv4)
+        if(l3_protocol == "IPv4")
         {
-            const uint8_t* ip_header = data + 14;
+            const IPv4Header* ip_header = reinterpret_cast<const IPv4Header*>(data + 14);
+            statistics.unique_src_ips.emplace(ip_header->src_ip);
+            statistics.unique_dst_ips.emplace(ip_header->dst_ip);
 
-            PacketProtocol l4_protocol = PacketProtocol::OTHER_L4;
-            uint8_t ip_protocol = *(ip_header + 9);
-            if(ip_protocol == 0x06) l4_protocol = PacketProtocol::TCP;
-            else if(ip_protocol == 0x11) l4_protocol = PacketProtocol::UDP;
-            else if(ip_protocol == 0x1) l4_protocol = PacketProtocol::ICMP;
+            std::string l4_protocol = "OTHER_L4";
+            if(ip_header->ip_proto == 0x06) l4_protocol = "TCP";
+            else if(ip_header->ip_proto == 0x11) l4_protocol = "UDP";
+            else if(ip_header->ip_proto == 0x1) l4_protocol = "ICMP";
             statistics.distribution_by_packet_protocol[l4_protocol]++;
 
-            const uint8_t* ip_start = ip_header + 12;
-            uint32_t src_ip = *((uint32_t*)ip_start);
-            uint32_t dst_ip = *((uint32_t*)(ip_start + 4));
-            statistics.unique_src_ips.emplace(src_ip);
-            statistics.unique_dst_ips.emplace(dst_ip);
-
-            if(l4_protocol == PacketProtocol::TCP)
+            if(l4_protocol == "TCP")
             {
-                const uint8_t* tcp_header = ip_header + 16; //TODO check it
-                uint16_t src_port = *((uint16_t*)tcp_header);
-                uint16_t dst_port = *((uint16_t*)(tcp_header + 2));
-                statistics.unique_src_ports.emplace(src_port);
-                statistics.unique_dst_ports.emplace(dst_port));
+                uint8_t ip_header_length = (ip_header->ip_verhl & 0x0F) * 4;
+                std::cout << "ip_header_length: " << (int)ip_header_length << std::endl;
 
-                uint8_t flags = *(tcp_header + 13); //TODO check it
+                const TcpHeader* tcp_header = reinterpret_cast<const TcpHeader*>(data + 14 + ip_header_length);
+                statistics.unique_src_ports.emplace(tcp_header->src_port);
+                statistics.unique_dst_ports.emplace(tcp_header->dst_port);
+
+                std::string flags = parse_packet_flags(tcp_header->flags);
+                statistics.distribution_by_packet_flags[flags]++;
             }
         }
         
