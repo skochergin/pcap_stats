@@ -61,13 +61,15 @@ struct PcapFileStats
                   << "  Total packets length: " << total_packets_length << std::endl
                   << print_distribution_by_packet_length(distribution_by_packet_length)
                   << print_distribution_by(distribution_by_packet_protocol, "Distribution by packet protocol")
-                  << "  Unique src_mac's: " << unique_src_macs.size() << std::endl
-                  << "  Unique dst_mac's: " << unique_dst_macs.size() << std::endl
-                  << "  Unique src_ip's: " << unique_src_ips.size() << std::endl
-                  << "  Unique dst_ip's: " << unique_dst_ips.size() << std::endl
+                  << "  Unique src_mac's:  " << unique_src_macs.size() << std::endl
+                  << "  Unique dst_mac's:  " << unique_dst_macs.size() << std::endl
+                  << "  Unique src_ip's:   " << unique_src_ips.size() << std::endl
+                  << "  Unique dst_ip's:   " << unique_dst_ips.size() << std::endl
                   << "  Unique src_port's: " << unique_src_ports.size() << std::endl
                   << "  Unique dst_port's: " << unique_dst_ports.size() << std::endl
                   << print_distribution_by(distribution_by_packet_flags, "Distribution by packet flags")
+                  << "  Total IP packets with correct checksum: " << total_packets_with_correct_checksum << std::endl
+                  << "  Total IP packets with incorrect checksum: " << total_packets_with_incorrect_checksum << std::endl
                   << "--------------------------------------------------------------------" << std::endl;
     }
 

@@ -46,6 +46,10 @@ void pcap_loop(uint8_t* user, const pcap_pkthdr* pkth, const uint8_t* data)
 
         uint8_t ip_header_length = (ip_header->verhl & 0x0F) * 4;
         bool l3_csum_correct = is_checksum_correct(reinterpret_cast<const uint16_t*>(data + 14), ip_header_length/2);
+        if(l3_csum_correct)
+            statistics->total_packets_with_correct_checksum++;
+        else
+            statistics->total_packets_with_incorrect_checksum++;
 
         if(l4_protocol == "TCP")
         {
