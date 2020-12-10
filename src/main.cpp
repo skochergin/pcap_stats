@@ -2,7 +2,7 @@
 #include <pcap.h>
 #include <filesystem>
 
-#include "PcapStatsCollector.hpp"
+#include "PcapStatsCollector.h"
 
 int main(int argc, const char* argv[])
 {
@@ -18,9 +18,7 @@ int main(int argc, const char* argv[])
         std::string ext = entry.path().extension();
         if(ext == ".pcap" || ext == ".pcapng")
         {
-            PcapStatsCollector collector {entry.path()};
-            auto stats = collector.process_packets();
-            stats.print_stats();
+            process_pcap_file(entry.path());
         }
     }
 }
