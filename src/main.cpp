@@ -1,18 +1,26 @@
 #include <iostream>
 #include <pcap.h>
+#include <filesystem>
 
 #include "PcapStatsCollector.hpp"
 
-// void pcap_loop(uint8_t* user, const pcap_pkthdr* pkth, const uint8_t* data){
-    // auto *context = reinterpret_cast<PcapContext*>(user);
-    // context->sniffer->packet_process(pkth, data);
-    // std::cout << "packet" << std::endl;
-// }
-
-int main()
+int main(int argc, const char* argv[])
 {
-    std::string file_name = "../pcaps/capt_Safe-Reset_302_pic.pcap";
-    PcapStatsCollector collector {file_name};
-    auto stats = collector.process_packets();
-    stats.print_stats();
+    if(argc != 2)
+    {
+        std::cout << "Please specify directory with pcap files as first argument." << std::endl;
+        return -1;
+    }
+    for(const auto& entry : std::filesystem::directory_iterator(argv[1]))
+    {
+        if(!entry.is_regular_file())
+            continue;
+        std::string ext = entry.path().extension();
+        if(ext == ".pcap" || ext == ".pcapng")
+        {
+            PcapStatsCollector collector {entry.path()};
+            auto stats = collector.process_packets();
+            stats.print_stats();
+        }
+    }
 }

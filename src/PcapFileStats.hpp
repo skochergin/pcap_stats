@@ -113,7 +113,8 @@ struct PcapFileStats
 
     void print_stats()
     {
-        std::cout << "File: " << file_name << std::endl
+        std::cout << std::endl
+                  << "Statistics for file: " << file_name << std::endl
                   << "  Total packets: " << total_packets << std::endl
                   << "  Total packets length: " << total_packets_length << std::endl
                   << print_distribution_by_packet_length(distribution_by_packet_length)
@@ -124,7 +125,8 @@ struct PcapFileStats
                   << "  Unique dst_ip's: " << unique_dst_ips.size() << std::endl
                   << "  Unique src_port's: " << unique_src_ports.size() << std::endl
                   << "  Unique dst_port's: " << unique_dst_ports.size() << std::endl
-                  << print_distribution_by(distribution_by_packet_flags, "Distribution by packet flags");
+                  << print_distribution_by(distribution_by_packet_flags, "Distribution by packet flags")
+                  << "--------------------------------------------------------------------" << std::endl;
     }
 
     std::string print_distribution_by_packet_length(const DistributionByLength& dist)
